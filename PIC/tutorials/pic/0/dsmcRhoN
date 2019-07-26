@@ -11,7 +11,7 @@ FoamFile
     format      ascii;
     class       volScalarField;
     location    "0";
-    object      rhoN;
+    object      dsmcRhoN;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -23,27 +23,33 @@ boundaryField
 {
     xPeriodic_half0
     {
-        type            cyclic;
+        type            calculated;
+        value           uniform 0;
     }
     yPeriodic_half0
     {
-        type            cyclic;
+        type            calculated;
+        value           uniform 0;
     }
     zPeriodic_half0
     {
-        type            cyclic;
+        type            calculated;
+        value           uniform 0;
     }
     yPeriodic_half1
     {
-        type            cyclic;
+        type            calculated;
+        value           uniform 0;
     }
     zPeriodic_half1
     {
-        type            cyclic;
+        type            calculated;
+        value           uniform 0;
     }
     xPeriodic_half1
     {
-        type            cyclic;
+        type            calculated;
+        value           uniform 0;
     }
 }
 

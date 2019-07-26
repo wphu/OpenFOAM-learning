@@ -133,7 +133,7 @@ Foam::DSMCParcel<ParcelType>::constantProperties::omega() const
 
 template<class ParcelType>
 inline Foam::scalar
-Foam::DsmcParcel<ParcelType>::constantProperties::charge() const
+Foam::DSMCParcel<ParcelType>::constantProperties::charge() const
 {
     return charge_;
 }

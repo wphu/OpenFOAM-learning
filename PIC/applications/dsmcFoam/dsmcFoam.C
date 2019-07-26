@@ -53,6 +53,12 @@ int main(int argc, char *argv[])
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
+        const volScalarField& rhoQ = mesh.lookupObject<volScalarField>("rhoQ");
+
+        solve( fvm::laplacian(phi) + rhoQ/constant::electromagnetic::epsilon0 );	
+
+        E=-fvc::grad(phi);
+
         dsmc.evolve();
 
         dsmc.info();

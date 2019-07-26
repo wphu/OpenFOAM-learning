@@ -45,6 +45,24 @@ bool Foam::DSMCParcel<ParcelType>::move
 
     const polyMesh& mesh = cloud.pMesh();
 
+
+	
+    const volVectorField& BField = mesh.lookupObject<volVectorField>("B");
+    vector B = BField.internalField()[p.cell()];
+
+    const volVectorField& EField = mesh.lookupObject<volVectorField>("E");
+    vector E = EField.internalField()[p.cell()];
+
+    const constantProperties& constProps(cloud.constProps(typeId_));
+
+    scalar C = trackTime * constProps.charge() / constProps.mass();
+    vector dv1 = C * ((U_ ^ B) + E);
+    vector dv2 = C * (((U_ + dv1 / 2) ^ B) + E);
+    vector dv3 = C * (((U_ + dv2 / 2) ^ B) + E);
+    vector dv4 = C * (((U_ + dv3) ^ B) + E);
+    U_ += (dv1 + 2*dv2 + 2*dv3 + dv4)/6;
+
+
     // For reduced-D cases, the velocity used to track needs to be
     // constrained, but the actual U_ of the parcel must not be
     // altered or used, as it is altered by patch interactions an
@@ -53,34 +71,6 @@ bool Foam::DSMCParcel<ParcelType>::move
 
     while (td.keepParticle && !td.switchProcessor && p.stepFraction() < 1)
     {
-
-        // Apply correction to position for reduced-D cases
-        meshTools::constrainToMeshCentre(mesh, p.position());
-
-        //Utracking = U_;
-
-        // Apply correction to velocity to constrain tracking for
-        // reduced-D cases
-        meshTools::constrainDirection(mesh, mesh.solutionD(), U_);
-
-        // Set the Lagrangian time-step
-        scalar dt = min(dtMax, tEnd);
-	
-        const volVectorField& BField = mesh.lookupObject<volVectorField>("B");
-        vector B = BField.internalField()[p.cell()];
-
-        const volVectorField& EField = mesh.lookupObject<volVectorField>("E");
-        vector E = EField.internalField()[p.cell()];
-
-        const constantProperties& constProps(td.cloud().constProps(typeId_));
-
-        scalar C = dt * constProps.charge() / constProps.mass();
-        vector dv1 = C * ((U_ ^ B) + E);
-        vector dv2 = C * (((U_ + dv1 / 2) ^ B) + E);
-        vector dv3 = C * (((U_ + dv2 / 2) ^ B) + E);
-        vector dv4 = C * (((U_ + dv3) ^ B) + E);
-        U_ += (dv1 + 2*dv2 + 2*dv3 + dv4)/6;
-
 
         Utracking = U_;
 

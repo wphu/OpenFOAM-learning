@@ -150,7 +150,7 @@ Foam::DSMCCloud<ParcelType>::rhoNBF()
 
 template<class ParcelType>
 inline Foam::volScalarField::Boundary&
-Foam::DsmcCloud<ParcelType>::rhoQBF()
+Foam::DSMCCloud<ParcelType>::rhoQBF()
 {
     return rhoQ_.boundaryFieldRef();
 }
@@ -440,7 +440,7 @@ Foam::DSMCCloud<ParcelType>::rhoN() const
 
 template<class ParcelType>
 inline const Foam::volScalarField&
-Foam::DsmcCloud<ParcelType>::rhoQ() const
+Foam::DSMCCloud<ParcelType>::rhoQ() const
 {
     return rhoQ_;
 }

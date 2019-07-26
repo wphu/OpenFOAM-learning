@@ -19,7 +19,7 @@ FoamFile
 // General Properties
 // ~~~~~~~~~~~~~~~~~~
 
-nEquivalentParticles            1e12;
+nEquivalentParticles            1e11;
 
 
 // Wall Interaction Model
@@ -58,6 +58,7 @@ moleculeProperties
         diameter                        4.17e-10;
         internalDegreesOfFreedom        2;
         omega                           0.74;
+        charge                          -1.6e-19;
     }
 
     O2
@@ -66,6 +67,7 @@ moleculeProperties
         diameter                        4.07e-10;
         internalDegreesOfFreedom        2;
         omega                           0.77;
+        charge                          1.6e-19;
     }
 }
 

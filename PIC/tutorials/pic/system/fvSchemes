@@ -9,43 +9,40 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volVectorField;
-    location    "0";
-    object      momentum;
+    class       dictionary;
+    location    "system";
+    object      fvSchemes;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [1 -2 -1 0 0 0 0];
-
-internalField   uniform (0 0 0);
-
-boundaryField
+ddtSchemes
 {
-    xPeriodic_half0
-    {
-        type            cyclic;
-    }
-    yPeriodic_half0
-    {
-        type            cyclic;
-    }
-    zPeriodic_half0
-    {
-        type            cyclic;
-    }
-    yPeriodic_half1
-    {
-        type            cyclic;
-    }
-    zPeriodic_half1
-    {
-        type            cyclic;
-    }
-    xPeriodic_half1
-    {
-        type            cyclic;
-    }
+    default steadyState;
 }
 
+gradSchemes
+{
+    default       Gauss linear;
+}
+
+divSchemes
+{
+    default         none;
+}
+
+laplacianSchemes
+{
+    default         Gauss linear corrected;
+}
+
+interpolationSchemes
+{
+    default         linear;
+}
+
+snGradSchemes
+{
+    default         none;
+}
 
 // ************************************************************************* //

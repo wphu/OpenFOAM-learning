@@ -9,43 +9,30 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volScalarField;
-    location    "0";
-    object      dsmcRhoN;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 -3 0 0 0 0 0];
 
-internalField   uniform 0;
-
-boundaryField
+solvers
 {
-    xPeriodic_half0
+    phi
     {
-        type            cyclic;
-    }
-    yPeriodic_half0
-    {
-        type            cyclic;
-    }
-    zPeriodic_half0
-    {
-        type            cyclic;
-    }
-    yPeriodic_half1
-    {
-        type            cyclic;
-    }
-    zPeriodic_half1
-    {
-        type            cyclic;
-    }
-    xPeriodic_half1
-    {
-        type            cyclic;
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-10;
+        relTol          0;
     }
 }
 
+SIMPLE
+{
+    nCorrectors 2;
+    nNonOrthogonalCorrectors 2;
+        tolerance       1e-10;
+        relTol          0;
+}
 
 // ************************************************************************* //
