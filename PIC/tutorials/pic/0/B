@@ -16,14 +16,14 @@ FoamFile
 
 dimensions      [1 0 -2 0 0 -1 0];
 
-internalField   uniform (0 0 0);
+internalField   uniform (2 0 0);
 
 boundaryField
 {
     ".*"
     {
         type            fixedValue;
-        value           uniform (0 0 0);
+        value           uniform (2 0 0);
     }
 }
 

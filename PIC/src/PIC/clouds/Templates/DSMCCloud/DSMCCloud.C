@@ -387,6 +387,7 @@ void Foam::DSMCCloud<ParcelType>::resetFields()
     );
 
     rhoN_ = dimensionedScalar( dimensionSet(0, -3, 0, 0, 0), vSmall);
+    rhoQ_ =  dimensionedScalar( dimensionSet(0, -3, 1, 0, 0, 1, 0), vSmall);
     rhoM_ =  dimensionedScalar( dimensionSet(1, -3, 0, 0, 0), vSmall);
     dsmcRhoN_ = dimensionedScalar( dimensionSet(0, -3, 0, 0, 0), 0);
     linearKE_ = dimensionedScalar( dimensionSet(1, -1, -2, 0, 0), 0);

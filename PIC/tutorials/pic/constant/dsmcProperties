@@ -19,7 +19,7 @@ FoamFile
 // General Properties
 // ~~~~~~~~~~~~~~~~~~
 
-nEquivalentParticles            1e11;
+nEquivalentParticles            100;
 
 
 // Wall Interaction Model
@@ -48,26 +48,26 @@ InflowBoundaryModel             none;
 // Molecular species
 // ~~~~~~~~~~~~~~~~~
 
-typeIdList                      (N2 O2);
+typeIdList                      (electron Dion);
 
 moleculeProperties
 {
-    N2
+    electron
     {
-        mass                            46.5e-27;
-        diameter                        4.17e-10;
+        mass                            9.109382616e-31;
+        diameter                        4.17e-15;
         internalDegreesOfFreedom        2;
         omega                           0.74;
-        charge                          -1.6e-19;
+        charge                          -1.602e-19;
     }
 
-    O2
+    Dion
     {
-        mass                            53.12e-27;
-        diameter                        4.07e-10;
+        mass                            3.34e-27;
+        diameter                        4.07e-15;
         internalDegreesOfFreedom        2;
         omega                           0.77;
-        charge                          1.6e-19;
+        charge                          1.602e-19;
     }
 }
 

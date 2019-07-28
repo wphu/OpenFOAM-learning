@@ -17,11 +17,11 @@ FoamFile
 
 numberDensities
 {
-    N2          0.1e18;
-    O2          0.1e18;
+    electron            1.0e18;
+    Dion                1.0e18;
 };
 
-temperature     300;
+temperature     100000;
 
 velocity        (0 0 0);
 
