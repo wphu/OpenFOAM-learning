@@ -1,0 +1,3 @@
+picInitialise.C
+
+EXE = $(FOAM_APPBIN)/picInitialise
