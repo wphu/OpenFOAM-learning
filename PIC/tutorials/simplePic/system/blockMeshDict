@@ -50,30 +50,34 @@ boundary
 
     yPeriodic_half0
     {
-        type patch;
+        type cyclic;
         faces ((2 3 7 6));
+        neighbourPatch yPeriodic_half1;
     }
 
     yPeriodic_half1
     {
-        type patch;
+        type cyclic;
         faces ((0 1 5 4));
+        neighbourPatch yPeriodic_half0;
     }
 
     zPeriodic_half0
     {
-        type patch;
+        type cyclic;
         faces ((4 5 6 7));
+        neighbourPatch zPeriodic_half1;
     }
 
     zPeriodic_half1
     {
-        type patch;
+        type cyclic;
         faces ((0 3 2 1));
+        neighbourPatch zPeriodic_half0;
     }
 );
 
-mergePatchPairs
+mergewallPairs
 (
 );
 

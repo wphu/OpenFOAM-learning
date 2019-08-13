@@ -21,27 +21,7 @@ internalField   uniform 0;
 
 boundaryField
 {
-     xPeriodic_half0
-    {
-        type            calculated;
-        value           uniform 0;
-    }
-    yPeriodic_half0
-    {
-        type            calculated;
-        value           uniform 0;
-    }
-    zPeriodic_half0
-    {
-        type            calculated;
-        value           uniform 0;
-    }
-    yPeriodic_half1
-    {
-        type            calculated;
-        value           uniform 0;
-    }
-    zPeriodic_half1
+    xPeriodic_half0
     {
         type            calculated;
         value           uniform 0;
@@ -50,6 +30,22 @@ boundaryField
     {
         type            calculated;
         value           uniform 0;
+    }
+    yPeriodic_half0
+    {
+        type            cyclic;
+    }
+    yPeriodic_half1
+    {
+        type            cyclic;
+    }
+    zPeriodic_half0
+    {
+        type            cyclic;
+    }
+    zPeriodic_half1
+    {
+        type            cyclic;
     }
 }
 

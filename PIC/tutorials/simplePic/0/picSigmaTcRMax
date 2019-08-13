@@ -31,19 +31,19 @@ boundaryField
     }
     yPeriodic_half0
     {
-        type            zeroGradient;
+        type            cyclic;
     }
     yPeriodic_half1
     {
-        type            zeroGradient;
+        type            cyclic;
     }
     zPeriodic_half0
     {
-        type            zeroGradient;
+        type            cyclic;
     }
     zPeriodic_half1
     {
-        type            zeroGradient;
+        type            cyclic;
     }
 }
 

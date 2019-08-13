@@ -61,55 +61,57 @@ functions
             {
                 mean        on;
                 prime2Mean  off;
-                base        time;
+                base        iteration;
+                window      5;
             }
             rhoM
             {
                 mean        on;
                 prime2Mean  off;
-                base        time;
+                base        iteration;
+                window      50;
             }
             dsmcRhoN
             {
                 mean        on;
                 prime2Mean  off;
-                base        time;
+                base        iteration;
             }
             momentum
             {
                 mean        on;
                 prime2Mean  off;
-                base        time;
+                base        iteration;
             }
             linearKE
             {
                 mean        on;
                 prime2Mean  off;
-                base        time;
+                base        iteration;
             }
             internalE
             {
                 mean        on;
                 prime2Mean  off;
-                base        time;
+                base        iteration;
             }
             iDof
             {
                 mean        on;
                 prime2Mean  off;
-                base        time;
+                base        iteration;
             }
             q
             {
                 mean        on;
                 prime2Mean  off;
-                base        time;
+                base        iteration;
             }
             fD
             {
                 mean        on;
                 prime2Mean  off;
-                base        time;
+                base        iteration;
             }
         );
     }
