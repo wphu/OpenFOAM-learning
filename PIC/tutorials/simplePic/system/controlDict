@@ -71,47 +71,19 @@ functions
                 base        iteration;
                 window      50;
             }
-            dsmcRhoN
+            phi
             {
                 mean        on;
                 prime2Mean  off;
                 base        iteration;
+                window      50;
             }
             momentum
             {
                 mean        on;
                 prime2Mean  off;
                 base        iteration;
-            }
-            linearKE
-            {
-                mean        on;
-                prime2Mean  off;
-                base        iteration;
-            }
-            internalE
-            {
-                mean        on;
-                prime2Mean  off;
-                base        iteration;
-            }
-            iDof
-            {
-                mean        on;
-                prime2Mean  off;
-                base        iteration;
-            }
-            q
-            {
-                mean        on;
-                prime2Mean  off;
-                base        iteration;
-            }
-            fD
-            {
-                mean        on;
-                prime2Mean  off;
-                base        iteration;
+                window      50;
             }
         );
     }

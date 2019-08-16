@@ -213,6 +213,44 @@ Foam::PICCloud<ParcelType>::boundaryU() const
 
 
 template<class ParcelType>
+inline Foam::volScalarField::Boundary&
+Foam::PICCloud<ParcelType>::particleFluxBF
+(
+    label typeId
+)
+{
+    if (typeId < 0 || typeId >= constProps_.size())
+    {
+        FatalErrorInFunction
+            << "constantProperties for requested typeId index "
+            << typeId << " do not exist" << nl
+            << abort(FatalError);
+    }
+
+    return particleFluxList_[typeId]->boundaryFieldRef();
+}
+
+
+template<class ParcelType>
+inline Foam::volScalarField::Boundary&
+Foam::PICCloud<ParcelType>::heatFluxBF
+(
+    label typeId
+)
+{
+    if (typeId < 0 || typeId >= constProps_.size())
+    {
+        FatalErrorInFunction
+            << "constantProperties for requested typeId index "
+            << typeId << " do not exist" << nl
+            << abort(FatalError);
+    }
+
+    return heatFluxList_[typeId]->boundaryFieldRef();
+}
+
+
+template<class ParcelType>
 inline const Foam::BinaryCollisionModel<Foam::PICCloud<ParcelType>>&
 Foam::PICCloud<ParcelType>::binaryCollision() const
 {

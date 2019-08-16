@@ -9,77 +9,45 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    object      blockMeshDict;
+    class       volScalarField;
+    location    "0";
+    object      rhoN_electron;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-convertToMeters 0.000025;
+dimensions      [0 -3 0 0 0 0 0];
 
-vertices
-(
-    (-5 -4 -4)
-    (5 -4 -4)
-    (5 4 -4)
-    (-5 4 -4)
-    (-5 -4 4)
-    (5 -4 4)
-    (5 4 4)
-    (-5 4 4)
-);
+internalField   uniform 0;
 
-blocks
-(
-    hex (0 1 2 3 4 5 6 7) (25 20 20) simpleGrading (1 1 1)
-);
-
-boundary
-(
+boundaryField
+{
     xPeriodic_half0
     {
-        type wall;
-        faces ((1 2 6 5));
+        type            calculated;
+        value           uniform 0;
     }
-
     xPeriodic_half1
     {
-        type wall;
-        faces ((0 4 7 3));
+        type            calculated;
+        value           uniform 0;
     }
-
     yPeriodic_half0
     {
-        type cyclic;
-        faces ((2 3 7 6));
-        neighbourPatch yPeriodic_half1;
+        type            cyclic;
     }
-
     yPeriodic_half1
     {
-        type cyclic;
-        faces ((0 1 5 4));
-        neighbourPatch yPeriodic_half0;
+        type            cyclic;
     }
-
     zPeriodic_half0
     {
-        type cyclic;
-        faces ((4 5 6 7));
-        neighbourPatch zPeriodic_half1;
+        type            cyclic;
     }
-
     zPeriodic_half1
     {
-        type cyclic;
-        faces ((0 3 2 1));
-        neighbourPatch zPeriodic_half0;
+        type            cyclic;
     }
-);
-
-mergewallPairs
-(
-);
+}
 
 
 // ************************************************************************* //

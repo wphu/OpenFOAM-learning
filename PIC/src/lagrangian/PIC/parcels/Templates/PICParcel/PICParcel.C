@@ -165,6 +165,8 @@ void Foam::PICParcel<ParcelType>::hitWallPatch
     // pre-interaction energy
     scalar preIE = 0.5*m*(U_ & U_) + Ei_;
 
+    scalar preE = 0.5*m*(U_ & U_);
+
     // pre-interaction momentum
     vector preIMom = m*U_;
 
@@ -203,6 +205,9 @@ void Foam::PICParcel<ParcelType>::hitWallPatch
     cloud.qBF()[wppIndex][wppLocalFace] += deltaQ;
 
     cloud.fDBF()[wppIndex][wppLocalFace] += deltaFD;
+
+    cloud.particleFluxBF(typeId_)[wppIndex][wppLocalFace] += cloud.nParticle()/(deltaT*fA);
+    cloud.heatFluxBF(typeId_)[wppIndex][wppLocalFace] += cloud.nParticle()*preE/(deltaT*fA);
 }
 
 

@@ -394,6 +394,22 @@ void Foam::PICCloud<ParcelType>::resetFields()
     internalE_ = dimensionedScalar( dimensionSet(1, -1, -2, 0, 0), 0);
     iDof_ = dimensionedScalar( dimensionSet(0, -3, 0, 0, 0), vSmall);
 
+    forAll(rhoNSpeciesList_, iRhoNSpecies)
+    {
+        (*rhoNSpeciesList_[iRhoNSpecies]) = dimensionedScalar( dimensionSet(0, -3, 0, 0, 0), vSmall);
+    }
+
+    forAll(particleFluxList_, iParticleFlux)
+    {
+        (*rhoNSpeciesList_[iParticleFlux]) = dimensionedScalar( dimensionSet(0, -3, 0, 0, 0), vSmall);
+    }
+
+    forAll(heatFluxList_, iHeatFlux)
+    {
+        (*rhoNSpeciesList_[iHeatFlux]) = dimensionedScalar( dimensionSet(0, -3, 0, 0, 0), vSmall);
+    }
+
+
     momentum_ = dimensionedVector
     (
         "zero",
@@ -419,6 +435,7 @@ void Foam::PICCloud<ParcelType>::calculateFields()
     {
         const ParcelType& p = iter();
         const label celli = p.cell();
+        const label typeId = p.typeId();
 
         rhoN[celli]++;
         rhoQ[celli] += constProps(p.typeId()).charge();
@@ -428,6 +445,8 @@ void Foam::PICCloud<ParcelType>::calculateFields()
         internalE[celli] += p.Ei();
         iDof[celli] += constProps(p.typeId()).internalDegreesOfFreedom();
         momentum[celli] += constProps(p.typeId()).mass()*p.U();
+
+        rhoNSpeciesList_[typeId]->primitiveFieldRef()[celli]++;
     }
 
     rhoN *= nParticle_/mesh().cellVolumes();
@@ -452,6 +471,13 @@ void Foam::PICCloud<ParcelType>::calculateFields()
 
     momentum *= nParticle_/mesh().cellVolumes();
     momentum_.correctBoundaryConditions();
+
+    forAll(rhoNSpeciesList_, iRhoNSpecies)
+    {
+        scalarField& rhoNSpecies = rhoNSpeciesList_[iRhoNSpecies]->primitiveFieldRef();
+        rhoNSpecies *= nParticle_/mesh().cellVolumes();
+        rhoNSpeciesList_[iRhoNSpecies]->correctBoundaryConditions();
+    }
 }
 
 
@@ -701,6 +727,77 @@ Foam::PICCloud<ParcelType>::PICCloud
 {
     buildConstProps();
     buildCellOccupancy();
+
+
+    rhoNSpeciesList_.setSize(typeIdList_.size());
+    forAll(rhoNSpeciesList_, iRhoNSpecies)
+    {
+        word name ("rhoN_" + typeIdList_[iRhoNSpecies]);
+
+        rhoNSpeciesList_[iRhoNSpecies].reset
+        (
+            new volScalarField
+            (
+                IOobject
+                (
+                    name,
+                    mesh_.time().timeName(),
+                    mesh_,
+                    IOobject::NO_READ,
+                    IOobject::AUTO_WRITE
+                ),
+                mesh_
+            )
+        );
+    }
+
+
+    particleFluxList_.setSize(typeIdList_.size());
+    forAll(particleFluxList_, iParticleFlux)
+    {
+        word name ("particleFlux_" + typeIdList_[iParticleFlux]);
+
+        particleFluxList_[iParticleFlux].reset
+        (
+            new volScalarField
+            (
+                IOobject
+                (
+                    name,
+                    mesh_.time().timeName(),
+                    mesh_,
+                    IOobject::NO_READ,
+                    IOobject::AUTO_WRITE
+                ),
+                mesh_
+            )
+        );
+    }
+
+    heatFluxList_.setSize(typeIdList_.size());
+    forAll(heatFluxList_, iHeatFlux)
+    {
+        word name ("heatFlux_" + typeIdList_[iHeatFlux]);
+
+        heatFluxList_[iHeatFlux].reset
+        (
+            new volScalarField
+            (
+                IOobject
+                (
+                    name,
+                    mesh_.time().timeName(),
+                    mesh_,
+                    IOobject::NO_READ,
+                    IOobject::AUTO_WRITE
+                ),
+                mesh_
+            )
+        );
+    }
+
+
+
 
     // Initialise the collision selection remainder to a random value between 0
     // and 1.

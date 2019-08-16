@@ -134,6 +134,15 @@ class PICCloud
         //- Momentum density field
         volVectorField momentum_;
 
+        //- Number density field for all particle species
+        List<autoPtr<volScalarField>> rhoNSpeciesList_;
+
+        //- particle flux field for all particle species
+        List<autoPtr<volScalarField>> particleFluxList_;
+
+        //- heat flux field for all particle species
+        List<autoPtr<volScalarField>> heatFluxList_;
+
         //- Parcel constant properties - one for each type
         List<typename ParcelType::constantProperties> constProps_;
 
@@ -300,6 +309,12 @@ public:
                 //- Return non-const momentum density boundary field reference
                 inline volVectorField::Boundary& momentumBF();
 
+                //- Return the particle flux of the given typeId
+                inline volScalarField::Boundary& particleFluxBF(label typeId);
+   
+                //- Return the heat flux of the given typeId
+                inline volScalarField::Boundary& heatFluxBF(label typeId);
+
 
             // References to the macroscopic fields
 
@@ -339,6 +354,8 @@ public:
 
                 //- Return the momentum density field
                 inline const volVectorField& momentum() const;
+
+
 
 
             // Kinetic theory helper functions
