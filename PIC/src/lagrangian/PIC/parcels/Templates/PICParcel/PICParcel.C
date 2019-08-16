@@ -114,7 +114,7 @@ template<class TrackCloudType>
 void Foam::PICParcel<ParcelType>::hitWallPatch
 (
     TrackCloudType& cloud,
-    trackingData&
+    trackingData& td
 )
 {
     const label wppIndex = this->patch();
@@ -137,77 +137,13 @@ void Foam::PICParcel<ParcelType>::hitWallPatch
 
     scalar charge = constProps.charge();
 
-    vector nw = wpp.faceAreas()[wppLocalFace];
-    nw /= mag(nw);
-
-    scalar U_dot_nw = U_ & nw;
-
-    vector Ut = U_ - U_dot_nw*nw;
-
-    scalar invMagUnfA = 1/max(mag(U_dot_nw)*fA, vSmall);
-
-    cloud.rhoNBF()[wppIndex][wppLocalFace] += invMagUnfA;
-
-    cloud.rhoQBF()[wppIndex][wppLocalFace] += charge*invMagUnfA;
-
-    cloud.rhoMBF()[wppIndex][wppLocalFace] += m*invMagUnfA;
-
-    cloud.linearKEBF()[wppIndex][wppLocalFace] +=
-        0.5*m*(U_ & U_)*invMagUnfA;
-
-    cloud.internalEBF()[wppIndex][wppLocalFace] += Ei_*invMagUnfA;
-
-    cloud.iDofBF()[wppIndex][wppLocalFace] +=
-        constProps.internalDegreesOfFreedom()*invMagUnfA;
-
-    cloud.momentumBF()[wppIndex][wppLocalFace] += m*Ut*invMagUnfA;
-
-    // pre-interaction energy
-    scalar preIE = 0.5*m*(U_ & U_) + Ei_;
-
-    scalar preE = 0.5*m*(U_ & U_);
-
-    // pre-interaction momentum
-    vector preIMom = m*U_;
-
-    cloud.wallInteraction().correct(*this);
-
-    U_dot_nw = U_ & nw;
-
-    Ut = U_ - U_dot_nw*nw;
-
-    invMagUnfA = 1/max(mag(U_dot_nw)*fA, vSmall);
-
-    cloud.rhoNBF()[wppIndex][wppLocalFace] += invMagUnfA;
-
-    cloud.rhoMBF()[wppIndex][wppLocalFace] += m*invMagUnfA;
-
-    cloud.linearKEBF()[wppIndex][wppLocalFace] +=
-        0.5*m*(U_ & U_)*invMagUnfA;
-
-    cloud.internalEBF()[wppIndex][wppLocalFace] += Ei_*invMagUnfA;
-
-    cloud.iDofBF()[wppIndex][wppLocalFace] +=
-        constProps.internalDegreesOfFreedom()*invMagUnfA;
-
-    cloud.momentumBF()[wppIndex][wppLocalFace] += m*Ut*invMagUnfA;
-
-    // post-interaction energy
-    scalar postIE = 0.5*m*(U_ & U_) + Ei_;
-
-    // post-interaction momentum
-    vector postIMom = m*U_;
-
-    scalar deltaQ = cloud.nParticle()*(preIE - postIE)/(deltaT*fA);
-
-    vector deltaFD = cloud.nParticle()*(preIMom - postIMom)/(deltaT*fA);
-
-    cloud.qBF()[wppIndex][wppLocalFace] += deltaQ;
-
-    cloud.fDBF()[wppIndex][wppLocalFace] += deltaFD;
+    // energy
+    scalar E = 0.5*m*(U_ & U_);
 
     cloud.particleFluxBF(typeId_)[wppIndex][wppLocalFace] += cloud.nParticle()/(deltaT*fA);
-    cloud.heatFluxBF(typeId_)[wppIndex][wppLocalFace] += cloud.nParticle()*preE/(deltaT*fA);
+    cloud.heatFluxBF(typeId_)[wppIndex][wppLocalFace] += cloud.nParticle()*E/(deltaT*fA);
+
+    td.keepParticle = false;
 }
 
 
