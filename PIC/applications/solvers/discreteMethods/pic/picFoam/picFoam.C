@@ -50,9 +50,7 @@ int main(int argc, char *argv[])
     Info<< "\nStarting time loop\n" << endl;
 
     while (runTime.loop())
-    {
-        Info<< "Time = " << runTime.timeName() << nl << endl;
-
+    { 
         const volScalarField& rhoQ = mesh.lookupObject<volScalarField>("rhoQ");
 
         solve( fvm::laplacian(phi) + rhoQ/constant::electromagnetic::epsilon0 );	
@@ -61,13 +59,20 @@ int main(int argc, char *argv[])
 
         pic.evolve();
 
-        pic.info();
-
         runTime.write();
 
-        Info<< nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-            << nl << endl;
+        if(runTime.outputTime())
+        {
+            Info<< "Time = " << runTime.timeName() << nl << endl;
+
+            pic.info();
+
+
+            Info<< nl << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+                << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+                << nl << endl;
+        }
+
     }
 
     Info<< "End\n" << endl;

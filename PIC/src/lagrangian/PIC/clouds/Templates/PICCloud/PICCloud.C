@@ -377,22 +377,9 @@ void Foam::PICCloud<ParcelType>::collisions()
 template<class ParcelType>
 void Foam::PICCloud<ParcelType>::resetFields()
 {
-    q_ = dimensionedScalar( dimensionSet(1, 0, -3, 0, 0), 0);
-
-    fD_ = dimensionedVector
-    (
-        "zero",
-        dimensionSet(1, -1, -2, 0, 0),
-        Zero
-    );
 
     rhoN_ = dimensionedScalar( dimensionSet(0, -3, 0, 0, 0), vSmall);
     rhoQ_ =  dimensionedScalar( dimensionSet(0, -3, 1, 0, 0, 1, 0), vSmall);
-    rhoM_ =  dimensionedScalar( dimensionSet(1, -3, 0, 0, 0), vSmall);
-    picRhoN_ = dimensionedScalar( dimensionSet(0, -3, 0, 0, 0), 0);
-    linearKE_ = dimensionedScalar( dimensionSet(1, -1, -2, 0, 0), 0);
-    internalE_ = dimensionedScalar( dimensionSet(1, -1, -2, 0, 0), 0);
-    iDof_ = dimensionedScalar( dimensionSet(0, -3, 0, 0, 0), vSmall);
 
     forAll(rhoNSpeciesList_, iRhoNSpecies)
     {
@@ -408,14 +395,6 @@ void Foam::PICCloud<ParcelType>::resetFields()
     {
         (*rhoNSpeciesList_[iHeatFlux]) = dimensionedScalar( dimensionSet(0, -3, 0, 0, 0), vSmall);
     }
-
-
-    momentum_ = dimensionedVector
-    (
-        "zero",
-        dimensionSet(1, -2, -1, 0, 0),
-        Zero
-    );
 }
 
 
@@ -423,13 +402,7 @@ template<class ParcelType>
 void Foam::PICCloud<ParcelType>::calculateFields()
 {
     scalarField& rhoN = rhoN_.primitiveFieldRef();
-    scalarField& rhoQ = rhoQ_.primitiveFieldRef();
-    scalarField& rhoM = rhoM_.primitiveFieldRef();
-    scalarField& picRhoN = picRhoN_.primitiveFieldRef();
-    scalarField& linearKE = linearKE_.primitiveFieldRef();
-    scalarField& internalE = internalE_.primitiveFieldRef();
-    scalarField& iDof = iDof_.primitiveFieldRef();
-    vectorField& momentum = momentum_.primitiveFieldRef();
+    scalarField& rhoQ = rhoQ_.primitiveFieldRef(); 
 
     forAllConstIter(typename PICCloud<ParcelType>, *this, iter)
     {
@@ -439,12 +412,6 @@ void Foam::PICCloud<ParcelType>::calculateFields()
 
         rhoN[celli]++;
         rhoQ[celli] += constProps(p.typeId()).charge();
-        rhoM[celli] += constProps(p.typeId()).mass();
-        picRhoN[celli]++;
-        linearKE[celli] += 0.5*constProps(p.typeId()).mass()*(p.U() & p.U());
-        internalE[celli] += p.Ei();
-        iDof[celli] += constProps(p.typeId()).internalDegreesOfFreedom();
-        momentum[celli] += constProps(p.typeId()).mass()*p.U();
 
         rhoNSpeciesList_[typeId]->primitiveFieldRef()[celli]++;
     }
@@ -454,23 +421,6 @@ void Foam::PICCloud<ParcelType>::calculateFields()
 
     rhoQ *= nParticle_/mesh().cellVolumes();
     rhoQ_.correctBoundaryConditions();
-
-    rhoM *= nParticle_/mesh().cellVolumes();
-    rhoM_.correctBoundaryConditions();
-
-    picRhoN_.correctBoundaryConditions();
-
-    linearKE *= nParticle_/mesh().cellVolumes();
-    linearKE_.correctBoundaryConditions();
-
-    internalE *= nParticle_/mesh().cellVolumes();
-    internalE_.correctBoundaryConditions();
-
-    iDof *= nParticle_/mesh().cellVolumes();
-    iDof_.correctBoundaryConditions();
-
-    momentum *= nParticle_/mesh().cellVolumes();
-    momentum_.correctBoundaryConditions();
 
     forAll(rhoNSpeciesList_, iRhoNSpecies)
     {
@@ -548,30 +498,6 @@ Foam::PICCloud<ParcelType>::PICCloud
         mesh_,
         dimensionedScalar(dimless, 0)
     ),
-    q_
-    (
-        IOobject
-        (
-            "q",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_
-    ),
-    fD_
-    (
-        IOobject
-        (
-            "fD",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_
-    ),
     rhoN_
     (
         IOobject
@@ -589,78 +515,6 @@ Foam::PICCloud<ParcelType>::PICCloud
         IOobject
         (
             "rhoQ",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_
-    ),
-    rhoM_
-    (
-        IOobject
-        (
-            "rhoM",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_
-    ),
-    picRhoN_
-    (
-        IOobject
-        (
-            "picRhoN",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_
-    ),
-    linearKE_
-    (
-        IOobject
-        (
-            "linearKE",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_
-    ),
-    internalE_
-    (
-        IOobject
-        (
-            "internalE",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_
-    ),
-    iDof_
-    (
-        IOobject
-        (
-            "iDof",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_
-    ),
-    momentum_
-    (
-        IOobject
-        (
-            "momentum",
             mesh_.time().timeName(),
             mesh_,
             IOobject::MUST_READ,
@@ -864,37 +718,6 @@ Foam::PICCloud<ParcelType>::PICCloud
         mesh_,
         dimensionedScalar(dimless, 0)
     ),
-    q_
-    (
-        IOobject
-        (
-            this->name() + "q_",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        mesh_,
-        dimensionedScalar( dimensionSet(1, 0, -3, 0, 0), 0)
-    ),
-    fD_
-    (
-        IOobject
-        (
-            this->name() + "fD_",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        mesh_,
-        dimensionedVector
-        (
-            "zero",
-            dimensionSet(1, -1, -2, 0, 0),
-            Zero
-        )
-    ),
     rhoN_
     (
         IOobject
@@ -920,89 +743,6 @@ Foam::PICCloud<ParcelType>::PICCloud
         ),
         mesh_,
         dimensionedScalar( dimensionSet(0, -3, 1, 0, 0, 1, 0), vSmall)
-    ),
-    rhoM_
-    (
-        IOobject
-        (
-            this->name() + "rhoM_",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        mesh_,
-        dimensionedScalar( dimensionSet(1, -3, 0, 0, 0), vSmall)
-    ),
-    picRhoN_
-    (
-        IOobject
-        (
-            this->name() + "picRhoN_",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        mesh_,
-        dimensionedScalar( dimensionSet(0, -3, 0, 0, 0), 0)
-    ),
-    linearKE_
-    (
-        IOobject
-        (
-            this->name() + "linearKE_",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        mesh_,
-        dimensionedScalar( dimensionSet(1, -1, -2, 0, 0), 0)
-    ),
-    internalE_
-    (
-        IOobject
-        (
-            this->name() + "internalE_",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        mesh_,
-        dimensionedScalar( dimensionSet(1, -1, -2, 0, 0), 0)
-    ),
-    iDof_
-    (
-        IOobject
-        (
-            this->name() + "iDof_",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        mesh_,
-        dimensionedScalar( dimensionSet(0, -3, 0, 0, 0), vSmall)
-    ),
-    momentum_
-    (
-        IOobject
-        (
-            this->name() + "momentum_",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        mesh_,
-        dimensionedVector
-        (
-            "zero",
-            dimensionSet(1, -2, -1, 0, 0),
-            Zero
-        )
     ),
     constProps_(),
     rndGen_(label(971501) + 1526*Pstream::myProcNo()),
@@ -1100,15 +840,6 @@ void Foam::PICCloud<ParcelType>::info() const
 
     scalar nMol = nPICParticles*nParticle_;
 
-    vector linearMomentum = linearMomentumOfSystem();
-    reduce(linearMomentum, sumOp<vector>());
-
-    scalar linearKineticEnergy = linearKineticEnergyOfSystem();
-    reduce(linearKineticEnergy, sumOp<scalar>());
-
-    scalar internalEnergy = internalEnergyOfSystem();
-    reduce(internalEnergy, sumOp<scalar>());
-
     Info<< "Cloud name: " << this->name() << nl
         << "    Number of pic particles        = "
         << nPICParticles
@@ -1118,18 +849,6 @@ void Foam::PICCloud<ParcelType>::info() const
     {
         Info<< "    Number of molecules             = "
             << nMol << nl
-            << "    Mass in system                  = "
-            << returnReduce(massInSystem(), sumOp<scalar>()) << nl
-            << "    Average linear momentum         = "
-            << linearMomentum/nMol << nl
-            << "   |Average linear momentum|        = "
-            << mag(linearMomentum)/nMol << nl
-            << "    Average linear kinetic energy   = "
-            << linearKineticEnergy/nMol << nl
-            << "    Average internal energy         = "
-            << internalEnergy/nMol << nl
-            << "    Average total energy            = "
-            << (internalEnergy + linearKineticEnergy)/nMol
             << endl;
     }
 }
@@ -1155,33 +874,7 @@ Foam::scalar Foam::PICCloud<ParcelType>::equipartitionInternalEnergy
     direction iDof
 )
 {
-    scalar Ei = 0.0;
-
-    if (iDof == 0)
-    {
-        return Ei;
-    }
-    else if (iDof == 2)
-    {
-        // Special case for iDof = 2, i.e. diatomics;
-        Ei = -log(rndGen_.scalar01())*physicoChemical::k.value()*temperature;
-    }
-    else
-    {
-        scalar a = 0.5*iDof - 1;
-        scalar energyRatio;
-        scalar P = -1;
-
-        do
-        {
-            energyRatio = 10*rndGen_.scalar01();
-            P = pow((energyRatio/a), a)*exp(a - energyRatio);
-        } while (P < rndGen_.scalar01());
-
-        Ei = energyRatio*physicoChemical::k.value()*temperature;
-    }
-
-    return Ei;
+ 
 }
 
 

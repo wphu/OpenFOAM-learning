@@ -78,13 +78,6 @@ functions
                 base        iteration;
                 window      50;
             }
-            momentum
-            {
-                mean        on;
-                prime2Mean  off;
-                base        iteration;
-                window      50;
-            }
         );
     }
     /*

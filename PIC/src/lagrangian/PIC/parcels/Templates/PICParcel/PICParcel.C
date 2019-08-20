@@ -46,7 +46,9 @@ bool Foam::PICParcel<ParcelType>::move
     const polyMesh& mesh = cloud.pMesh();
 
 
-	
+
+
+	/*
     const volVectorField& BField = mesh.lookupObject<volVectorField>("B");
     vector B = BField.internalField()[p.cell()];
 
@@ -61,6 +63,9 @@ bool Foam::PICParcel<ParcelType>::move
     vector dv3 = C * (((U_ + dv2 / 2) ^ B) + E);
     vector dv4 = C * (((U_ + dv3) ^ B) + E);
     U_ += (dv1 + 2*dv2 + 2*dv3 + dv4)/6;
+    */
+
+
 
 
     // For reduced-D cases, the velocity used to track needs to be
@@ -72,6 +77,7 @@ bool Foam::PICParcel<ParcelType>::move
     while (td.keepParticle && !td.switchProcessor && p.stepFraction() < 1)
     {
 
+        /*
         Utracking = U_;
 
         // Apply correction to velocity to constrain tracking for
@@ -83,6 +89,33 @@ bool Foam::PICParcel<ParcelType>::move
 
         const scalar f = 1 - p.stepFraction();
         p.trackToAndHitFace(f*trackTime*Utracking - d, f, cloud, td);
+        */
+
+
+
+        const scalar sfrac = p.stepFraction();
+
+        const scalar f = 1 - p.stepFraction();
+        p.trackToAndHitFace(f*trackTime*U_, f, cloud, td);
+
+        const scalar dt = (p.stepFraction() - sfrac)*trackTime;
+
+        const volVectorField& BField = mesh.lookupObject<volVectorField>("B");
+        vector B = BField.internalField()[p.cell()];
+
+        const volVectorField& EField = mesh.lookupObject<volVectorField>("E");
+        vector E = EField.internalField()[p.cell()];
+
+        const constantProperties& constProps(cloud.constProps(typeId_));
+
+        scalar C = dt * constProps.charge() / constProps.mass();
+        vector dv1 = C * ((U_ ^ B) + E);
+        vector dv2 = C * (((U_ + dv1 / 2) ^ B) + E);
+        vector dv3 = C * (((U_ + dv2 / 2) ^ B) + E);
+        vector dv4 = C * (((U_ + dv3) ^ B) + E);
+        U_ += (dv1 + 2*dv2 + 2*dv3 + dv4)/6;
+
+
     }
 
     return td.keepParticle;

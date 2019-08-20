@@ -104,35 +104,11 @@ class PICCloud
         //- A field holding the remainder from the previous collision selections
         volScalarField::Internal collisionSelectionRemainder_;
 
-        //- Heat flux at surface field
-        volScalarField q_;
-
-        //- Force density at surface field
-        volVectorField fD_;
-
         //- Number density field
         volScalarField rhoN_;
 
         //- charge density field
         volScalarField rhoQ_;
-
-        //- Mass density field
-        volScalarField rhoM_;
-
-        //- Dsmc particle density field
-        volScalarField picRhoN_;
-
-        //- Linear kinetic energy density field
-        volScalarField linearKE_;
-
-        //- Internal energy density field
-        volScalarField internalE_;
-
-        // Internal degree of freedom density field
-        volScalarField iDof_;
-
-        //- Momentum density field
-        volVectorField momentum_;
 
         //- Number density field for all particle species
         List<autoPtr<volScalarField>> rhoNSpeciesList_;
@@ -279,35 +255,11 @@ public:
 
             // References to the boundary fields for surface data collection
 
-                //- Return non-const heat flux boundary field reference
-                inline volScalarField::Boundary& qBF();
-
-                //- Return non-const force density at boundary field reference
-                inline volVectorField::Boundary& fDBF();
-
                 //- Return non-const number density boundary field reference
                 inline volScalarField::Boundary& rhoNBF();
 
-                //- Return non-const charge density boundary field reference
+                //- Return non-const number charge density boundary field reference
                 inline volScalarField::Boundary& rhoQBF();
-
-                //- Return non-const mass density boundary field reference
-                inline volScalarField::Boundary& rhoMBF();
-
-                //- Return non-const linear kinetic energy density boundary
-                //  field reference
-                inline volScalarField::Boundary& linearKEBF();
-
-                //- Return non-const internal energy density boundary field
-                // reference
-                inline volScalarField::Boundary& internalEBF();
-
-                //- Return non-const internal degree of freedom density boundary
-                //  field reference
-                inline volScalarField::Boundary& iDofBF();
-
-                //- Return non-const momentum density boundary field reference
-                inline volVectorField::Boundary& momentumBF();
 
                 //- Return the particle flux of the given typeId
                 inline volScalarField::Boundary& particleFluxBF(label typeId);
@@ -324,38 +276,12 @@ public:
                 //- Return macroscopic velocity
                 inline const volVectorField& boundaryU() const;
 
-                //- Return heat flux at surface field
-                inline const volScalarField& q() const;
-
-                //- Return force density at surface field
-                inline const volVectorField& fD() const;
-
                 //- Return the real particle number density field
                 inline const volScalarField& rhoN() const;
 
                 //- Return the real particle charge density field
                 inline const volScalarField& rhoQ() const;
                 
-                //- Return the particle mass density field
-                inline const volScalarField& rhoM() const;
-
-                //- Return the field of number of PIC particles
-                inline const volScalarField& picRhoN() const;
-
-                //- Return the total linear kinetic energy (translational and
-                // thermal density field
-                inline const volScalarField& linearKE() const;
-
-                //- Return the internal energy density field
-                inline const volScalarField& internalE() const;
-
-                //- Return the average internal degrees of freedom  field
-                inline const volScalarField& iDof() const;
-
-                //- Return the momentum density field
-                inline const volVectorField& momentum() const;
-
-
 
 
             // Kinetic theory helper functions

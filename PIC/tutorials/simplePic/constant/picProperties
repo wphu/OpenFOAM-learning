@@ -31,7 +31,7 @@ WallInteractionModel            SpecularReflection;
 // Binary Collision Model
 // ~~~~~~~~~~~~~~~~~~~~~~
 
-BinaryCollisionModel            LarsenBorgnakkeVariableHardSphere;
+BinaryCollisionModel            none;
 
 LarsenBorgnakkeVariableHardSphereCoeffs
 {

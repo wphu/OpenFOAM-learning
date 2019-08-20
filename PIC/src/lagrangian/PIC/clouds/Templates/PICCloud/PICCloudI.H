@@ -126,22 +126,6 @@ inline Foam::Random& Foam::PICCloud<ParcelType>::rndGen()
 
 template<class ParcelType>
 inline Foam::volScalarField::Boundary&
-Foam::PICCloud<ParcelType>::qBF()
-{
-    return q_.boundaryFieldRef();
-}
-
-
-template<class ParcelType>
-inline Foam::volVectorField::Boundary&
-Foam::PICCloud<ParcelType>::fDBF()
-{
-    return fD_.boundaryFieldRef();
-}
-
-
-template<class ParcelType>
-inline Foam::volScalarField::Boundary&
 Foam::PICCloud<ParcelType>::rhoNBF()
 {
     return rhoN_.boundaryFieldRef();
@@ -153,46 +137,6 @@ inline Foam::volScalarField::Boundary&
 Foam::PICCloud<ParcelType>::rhoQBF()
 {
     return rhoQ_.boundaryFieldRef();
-}
-
-
-template<class ParcelType>
-inline Foam::volScalarField::Boundary&
-Foam::PICCloud<ParcelType>::rhoMBF()
-{
-    return rhoM_.boundaryFieldRef();
-}
-
-
-template<class ParcelType>
-inline Foam::volScalarField::Boundary&
-Foam::PICCloud<ParcelType>::linearKEBF()
-{
-    return linearKE_.boundaryFieldRef();
-}
-
-
-template<class ParcelType>
-inline Foam::volScalarField::Boundary&
-Foam::PICCloud<ParcelType>::internalEBF()
-{
-    return internalE_.boundaryFieldRef();
-}
-
-
-template<class ParcelType>
-inline Foam::volScalarField::Boundary&
-Foam::PICCloud<ParcelType>::iDofBF()
-{
-    return iDof_.boundaryFieldRef();
-}
-
-
-template<class ParcelType>
-inline Foam::volVectorField::Boundary&
-Foam::PICCloud<ParcelType>::momentumBF()
-{
-    return momentum_.boundaryFieldRef();
 }
 
 
@@ -455,20 +399,6 @@ Foam::PICCloud<ParcelType>::maxwellianMostProbableSpeed
 
 
 template<class ParcelType>
-inline const Foam::volScalarField& Foam::PICCloud<ParcelType>::q() const
-{
-    return q_;
-}
-
-
-template<class ParcelType>
-inline const Foam::volVectorField& Foam::PICCloud<ParcelType>::fD() const
-{
-    return fD_;
-}
-
-
-template<class ParcelType>
 inline const Foam::volScalarField&
 Foam::PICCloud<ParcelType>::rhoN() const
 {
@@ -483,51 +413,6 @@ Foam::PICCloud<ParcelType>::rhoQ() const
     return rhoQ_;
 }
 
-
-template<class ParcelType>
-inline const Foam::volScalarField& Foam::PICCloud<ParcelType>::rhoM() const
-{
-    return rhoM_;
-}
-
-
-template<class ParcelType>
-inline const Foam::volScalarField&
-Foam::PICCloud<ParcelType>::picRhoN() const
-{
-    return picRhoN_;
-}
-
-
-template<class ParcelType>
-inline const Foam::volScalarField&
-Foam::PICCloud<ParcelType>::linearKE() const
-{
-    return linearKE_;
-}
-
-
-template<class ParcelType>
-inline const Foam::volScalarField&
-Foam::PICCloud<ParcelType>::internalE() const
-{
-    return internalE_;
-}
-
-
-template<class ParcelType>
-inline const Foam::volScalarField&
-Foam::PICCloud<ParcelType>::iDof() const
-{
-    return iDof_;
-}
-
-
-template<class ParcelType>
-inline const Foam::volVectorField& Foam::PICCloud<ParcelType>::momentum() const
-{
-    return momentum_;
-}
 
 
 template<class ParcelType>
