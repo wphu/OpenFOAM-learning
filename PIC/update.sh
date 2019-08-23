@@ -4,4 +4,4 @@ cp -rf /home/huwanpeng/OpenFOAM/OpenFOAM-dev/applications/solvers/discreteMethod
 
 
 cp -rf /home/huwanpeng/OpenFOAM/OpenFOAM-dev/applications/utilities/preProcessing/picInitialise/* ~/codes/OpenFOAM-learning/PIC/applications/utilities/preProcessing/picInitialise/
-cp -rf /home/huwanpeng/OpenFOAM-run/discreteMethods/picFoam/simplePic/* ~/codes/OpenFOAM-learning/PIC/tutorials/simplePic/
+cp -rf /home/huwanpeng/OpenFOAM-run/discreteMethods/picFoam/* ~/codes/OpenFOAM-learning/PIC/tutorials

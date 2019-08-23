@@ -92,7 +92,6 @@ bool Foam::PICParcel<ParcelType>::move
         */
 
 
-
         const scalar sfrac = p.stepFraction();
 
         const scalar f = 1 - p.stepFraction();
@@ -108,6 +107,7 @@ bool Foam::PICParcel<ParcelType>::move
 
         const constantProperties& constProps(cloud.constProps(typeId_));
 
+        // 4th order Runge-Kutta methods
         scalar C = dt * constProps.charge() / constProps.mass();
         vector dv1 = C * ((U_ ^ B) + E);
         vector dv2 = C * (((U_ + dv1 / 2) ^ B) + E);

@@ -12,7 +12,5 @@ runApplication blockMesh
 runApplication decomposePar
 runParallel picInitialise
 runParallel $(getApplication)
-runApplication reconstructPar #-noLagrangian
-
-
+runApplication reconstructPar -noLagrangian
 #------------------------------------------------------------------------------
