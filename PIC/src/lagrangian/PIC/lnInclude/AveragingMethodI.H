@@ -1,0 +1,1 @@
+../submodels/AveragingMethods/AveragingMethod/AveragingMethodI.H

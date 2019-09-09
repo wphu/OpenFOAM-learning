@@ -23,13 +23,13 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         1e-8;
+endTime         1e-7;
 
 deltaT          1e-12;
 
 writeControl    runTime;
 
-writeInterval   1e-9;
+writeInterval   1e-8;
 
 purgeWrite      0;
 
@@ -62,21 +62,21 @@ functions
                 mean        on;
                 prime2Mean  off;
                 base        iteration;
-                window      5;
+                window      500;
             }
             rhoM
             {
                 mean        on;
                 prime2Mean  off;
                 base        iteration;
-                window      50;
+                window      500;
             }
             phi
             {
                 mean        on;
                 prime2Mean  off;
                 base        iteration;
-                window      50;
+                window      500;
             }
         );
     }

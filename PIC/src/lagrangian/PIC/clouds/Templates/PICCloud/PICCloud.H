@@ -62,6 +62,9 @@ class WallInteractionModel;
 template<class CloudType>
 class InflowBoundaryModel;
 
+template<class Type>
+class AveragingMethod;
+
 /*---------------------------------------------------------------------------*\
                          Class PICCloud Declaration
 \*---------------------------------------------------------------------------*/
@@ -109,6 +112,12 @@ class PICCloud
 
         //- charge density field
         volScalarField rhoQ_;
+
+        //- charge density field
+        volScalarField rhoQNew_;
+
+        //- Density average
+        autoPtr<AveragingMethod<scalar>> rhoQNewAverage_;
 
         //- Number density field for all particle species
         List<autoPtr<volScalarField>> rhoNSpeciesList_;

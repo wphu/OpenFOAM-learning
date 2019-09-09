@@ -413,8 +413,8 @@ void Foam::FreeStream<CloudType>::inflow()
 
     reduce(particlesInserted, sumOp<label>());
 
-    Info<< "    Particles inserted              = "
-        << particlesInserted << endl;
+    //Info<< "    Particles inserted              = "
+    //    << particlesInserted << endl;
 
 }
 

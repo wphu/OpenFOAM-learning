@@ -30,6 +30,8 @@ License
 #include "constants.H"
 #include "zeroGradientFvPatchFields.H"
 #include "polyMeshTetDecomposition.H"
+#include "AveragingMethod.H"
+#include "interpolationCellPoint.H"
 
 using namespace Foam::constant;
 
@@ -380,6 +382,7 @@ void Foam::PICCloud<ParcelType>::resetFields()
 
     rhoN_ = dimensionedScalar( dimensionSet(0, -3, 0, 0, 0), vSmall);
     rhoQ_ =  dimensionedScalar( dimensionSet(0, -3, 1, 0, 0, 1, 0), vSmall);
+    rhoQNew_ =  dimensionedScalar( dimensionSet(0, -3, 1, 0, 0, 1, 0), vSmall);
 
     forAll(rhoNSpeciesList_, iRhoNSpecies)
     {
@@ -403,17 +406,22 @@ void Foam::PICCloud<ParcelType>::calculateFields()
 {
     scalarField& rhoN = rhoN_.primitiveFieldRef();
     scalarField& rhoQ = rhoQ_.primitiveFieldRef(); 
+    scalarField& rhoQNew = rhoQNew_.primitiveFieldRef(); 
 
     forAllConstIter(typename PICCloud<ParcelType>, *this, iter)
     {
         const ParcelType& p = iter();
         const label celli = p.cell();
         const label typeId = p.typeId();
+        const scalar q = constProps(p.typeId()).charge();
 
         rhoN[celli]++;
-        rhoQ[celli] += constProps(p.typeId()).charge();
+        rhoQ[celli] += q;
 
         rhoNSpeciesList_[typeId]->primitiveFieldRef()[celli]++;
+
+        const tetIndices tetIs = p.currentTetIndices();
+        rhoQNewAverage_->add(p.coordinates(), tetIs, q);
     }
 
     rhoN *= nParticle_/mesh().cellVolumes();
@@ -428,6 +436,8 @@ void Foam::PICCloud<ParcelType>::calculateFields()
         rhoNSpecies *= nParticle_/mesh().cellVolumes();
         rhoNSpeciesList_[iRhoNSpecies]->correctBoundaryConditions();
     }
+
+
 }
 
 
@@ -515,6 +525,18 @@ Foam::PICCloud<ParcelType>::PICCloud
         IOobject
         (
             "rhoQ",
+            mesh_.time().timeName(),
+            mesh_,
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh_
+    ),
+    rhoQNew_
+    (
+        IOobject
+        (
+            "rhoQNew",
             mesh_.time().timeName(),
             mesh_,
             IOobject::MUST_READ,
@@ -651,6 +673,31 @@ Foam::PICCloud<ParcelType>::PICCloud
     }
 
 
+    
+    dictionary AveragingMethod_dict
+    (
+        particleProperties_.subDict("moleculeProperties")
+    );
+
+    //typename ParcelType::trackingData td(*this);
+
+    rhoQNewAverage_ = 
+    (
+        AveragingMethod<scalar>::New
+        (
+            IOobject
+            (
+                this->name() + ":rhoQNewAverage",
+                this->db().time().timeName(),
+                this->mesh()
+            ),
+            AveragingMethod_dict,
+            this->mesh()
+        )
+    );
+    
+    
+
 
 
     // Initialise the collision selection remainder to a random value between 0
@@ -744,6 +791,19 @@ Foam::PICCloud<ParcelType>::PICCloud
         mesh_,
         dimensionedScalar( dimensionSet(0, -3, 1, 0, 0, 1, 0), vSmall)
     ),
+    rhoQNew_
+    (
+        IOobject
+        (
+            this->name() + "rhoQNew_",
+            mesh_.time().timeName(),
+            mesh_,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh_,
+        dimensionedScalar( dimensionSet(0, -3, 1, 0, 0, 1, 0), vSmall)
+    ),
     constProps_(),
     rndGen_(label(971501) + 1526*Pstream::myProcNo()),
     boundaryT_
@@ -790,6 +850,30 @@ Foam::PICCloud<ParcelType>::PICCloud
     clear();
     buildConstProps();
     initialise(picInitialiseDict);
+
+    
+    dictionary AveragingMethod_dict
+    (
+        particleProperties_.subDict("moleculeProperties")
+    );
+
+    //typename ParcelType::trackingData td(*this);
+
+    rhoQNewAverage_ = 
+    (
+        AveragingMethod<scalar>::New
+        (
+            IOobject
+            (
+                this->name() + ":rhoQNewAverage",
+                this->db().time().timeName(),
+                this->mesh()
+            ),
+            AveragingMethod_dict,
+            this->mesh()
+        )
+    );
+    
 }
 
 
@@ -805,7 +889,7 @@ Foam::PICCloud<ParcelType>::~PICCloud()
 template<class ParcelType>
 void Foam::PICCloud<ParcelType>::evolve()
 {
-    typename ParcelType::trackingData td(*this);
+    //typename ParcelType::trackingData td(*this);
 
     // Reset the data collection fields
     resetFields();
@@ -817,6 +901,16 @@ void Foam::PICCloud<ParcelType>::evolve()
 
     // Insert new particles from the inflow boundary
     this->inflowBoundary().inflow();
+
+
+    const volVectorField& E = mesh_.lookupObject<const volVectorField>("E");
+    const volVectorField& B = mesh_.lookupObject<const volVectorField>("B");
+
+    interpolationCellPoint<vector> EInterp(E);
+    interpolationCellPoint<vector> BInterp(B);
+
+
+    typename ParcelType::trackingData td(*this, EInterp, BInterp);
 
     // Move the particles ballistically with their current velocities
     Cloud<ParcelType>::move(*this, td, mesh_.time().deltaTValue());

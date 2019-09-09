@@ -38,13 +38,13 @@ boundary
 (
     xPeriodic_half0
     {
-        type wall;
+        type patch;
         faces ((1 2 6 5));
     }
 
     xPeriodic_half1
     {
-        type wall;
+        type patch;
         faces ((0 4 7 3));
     }
 

@@ -22,10 +22,10 @@ FoamFile
 nEquivalentParticles            10;
 
 
-// Wall Interaction Model
+// Wall Interaction Model:  MaxwellianThermal, SpecularReflection;
 // ~~~~~~~~~~~~~~~~~~~~~~
 
-WallInteractionModel            SpecularReflection;
+WallInteractionModel            MaxwellianThermal;
 
 
 // Binary Collision Model

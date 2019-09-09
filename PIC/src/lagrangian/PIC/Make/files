@@ -10,4 +10,7 @@ parcels/derived/picParcel/makePICParcelBinaryCollisionModels.C
 parcels/derived/picParcel/makePICParcelWallInteractionModels.C
 parcels/derived/picParcel/makePICParcelInflowBoundaryModels.C
 
+/* averaging methods */
+submodels/AveragingMethods/makeAveragingMethods.C
+
 LIB = $(FOAM_LIBBIN)/libPIC

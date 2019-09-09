@@ -22,7 +22,7 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
-
+#include <stdlib.h>
 #include "PICParcel.H"
 #include "meshTools.H"
 
@@ -46,18 +46,155 @@ bool Foam::PICParcel<ParcelType>::move
     const polyMesh& mesh = cloud.pMesh();
 
 
+    /*
+    // only update velocity at the begenning of the current step
+    // if the particle crosses processor patch, it will not be updated again, for mpi parallel
+    if(p.stepFraction() == 0.0)
+    {
+        // 0 order interpolate
+        //const volVectorField& BField = mesh.lookupObject<volVectorField>("B");
+        //vector B = BField.internalField()[p.cell()];
+
+        //const volVectorField& EField = mesh.lookupObject<volVectorField>("E");
+        //vector E = EField.internalField()[p.cell()];
+        
+
+        // 1 order interpolate
+        
+        const tetIndices tetIs = this->currentTetIndices();
+        vector E = td.EInterp().interpolate(this->coordinates(), tetIs);
+        vector B = td.BInterp().interpolate(this->coordinates(), tetIs);
+        
+
+        const constantProperties& constProps(cloud.constProps(typeId_));
+
+        // 4th order Runge-Kutta methods
+        
+        //scalar C = trackTime * constProps.charge() / constProps.mass();
+        //vector dv1 = C * ((U_ ^ B) + E);
+        //vector dv2 = C * (((U_ + dv1 / 2) ^ B) + E);
+        //vector dv3 = C * (((U_ + dv2 / 2) ^ B) + E);
+        //vector dv4 = C * (((U_ + dv3) ^ B) + E);
+        //U_ += (dv1 + 2*dv2 + 2*dv3 + dv4)/6;
+        
+
+        // Boris frog-leakp
+        //Info<<U_<<E<<endl;
+        const scalar C = 0.5 * trackTime * constProps.charge() / constProps.mass();
+        vector t = C * B;
+        const scalar t_mag = mag(t);
+        vector s = 2.0 * t / (1.0 + t_mag * t_mag);
+        vector v1 = U_ + C * E;
+        vector v2 = v1 + (v1 ^ t);
+        vector v3 = v1 + (v2 ^ s);
+        //Info<<U_<<t<<s<<v1<<v2<<v3<<endl;
+        U_ = v3 + C * E;
+        //Info<<U_<<E<<(v1^t)<<endl;
+        //std::exit(0);
+    }
+    */
+
+    // 
+    while (td.keepParticle && !td.switchProcessor && p.stepFraction() < 1)
+    {
+
+        const scalar sfrac = p.stepFraction();
+
+        const scalar f = 1 - p.stepFraction();
+        p.trackToAndHitFace(f*trackTime*U_, f, cloud, td);
 
 
-	/*
+        
+        const scalar dt = (p.stepFraction() - sfrac)*trackTime;
+ 
+        // 0 order interpolate
+        
+        //const volVectorField& BField = mesh.lookupObject<volVectorField>("B");
+        //vector B = BField.internalField()[p.cell()];
+
+        //const volVectorField& EField = mesh.lookupObject<volVectorField>("E");
+        //vector E = EField.internalField()[p.cell()];
+        
+
+        // 1 order interpolate
+        
+        const tetIndices tetIs = this->currentTetIndices();
+        vector E = td.EInterp().interpolate(this->coordinates(), tetIs);
+        vector B = td.BInterp().interpolate(this->coordinates(), tetIs);
+        
+
+        const constantProperties& constProps(cloud.constProps(typeId_));
+
+        // 4th order Runge-Kutta methods
+        
+        //scalar C = dt * constProps.charge() / constProps.mass();
+        //vector dv1 = C * ((U_ ^ B) + E);
+        //vector dv2 = C * (((U_ + dv1 / 2) ^ B) + E);
+        //vector dv3 = C * (((U_ + dv2 / 2) ^ B) + E);
+        //vector dv4 = C * (((U_ + dv3) ^ B) + E);
+        //U_ += (dv1 + 2*dv2 + 2*dv3 + dv4)/6;
+        
+
+        // Boris frog-leakp
+        //Info<<U_<<E<<endl;
+        const scalar C = 0.5 * dt * constProps.charge() / constProps.mass();
+        vector t = C * B;
+        const scalar t_mag = mag(t);
+        vector s = 2.0 * t / (1.0 + t_mag * t_mag);
+        vector v1 = U_ + C * E;
+        vector v2 = v1 + (v1 ^ t);
+        vector v3 = v1 + (v2 ^ s);
+        //Info<<U_<<t<<s<<v1<<v2<<v3<<endl;
+        U_ = v3 + C * E;
+        //Info<<U_<<E<<(v1^t)<<endl;
+        //std::exit(0);
+        
+
+    }
+
+    return td.keepParticle;
+}
+
+
+template<class ParcelType>
+template<class TrackCloudType>
+bool Foam::PICParcel<ParcelType>::updateVelocity
+(
+    TrackCloudType& cloud,
+    trackingData& td,
+    const scalar trackTime
+)
+{
+    typename TrackCloudType::parcelType& p =
+        static_cast<typename TrackCloudType::parcelType&>(*this);
+
+    //td.switchProcessor = false;
+    //td.keepParticle = true;
+
+    const polyMesh& mesh = cloud.pMesh();
+
+
+    // 0 order interpolate
+    /*
     const volVectorField& BField = mesh.lookupObject<volVectorField>("B");
     vector B = BField.internalField()[p.cell()];
 
     const volVectorField& EField = mesh.lookupObject<volVectorField>("E");
     vector E = EField.internalField()[p.cell()];
+    */
+
+    // 1 order interpolate
+    
+    const tetIndices tetIs = this->currentTetIndices();
+    vector E = td.EInterp().interpolate(this->coordinates(), tetIs);
+    vector B = td.BInterp().interpolate(this->coordinates(), tetIs);
+    
 
     const constantProperties& constProps(cloud.constProps(typeId_));
 
-    scalar C = trackTime * constProps.charge() / constProps.mass();
+    // 4th order Runge-Kutta methods
+    /*
+    scalar C = dt * constProps.charge() / constProps.mass();
     vector dv1 = C * ((U_ ^ B) + E);
     vector dv2 = C * (((U_ + dv1 / 2) ^ B) + E);
     vector dv3 = C * (((U_ + dv2 / 2) ^ B) + E);
@@ -65,60 +202,21 @@ bool Foam::PICParcel<ParcelType>::move
     U_ += (dv1 + 2*dv2 + 2*dv3 + dv4)/6;
     */
 
+    // Boris frog-leakp
+    //Info<<U_<<E<<endl;
+    const scalar C = 0.5 * trackTime * constProps.charge() / constProps.mass();
+    vector t = C * B;
+    const scalar t_mag = mag(t);
+    vector s = 2.0 * t / (1.0 + t_mag * t_mag);
+    vector v1 = U_ + C * E;
+    vector v2 = v1 + (v1 ^ t);
+    vector v3 = v1 + (v2 ^ s);
+    //Info<<U_<<t<<s<<v1<<v2<<v3<<endl;
+    U_ = v3 + C * E;
+    //Info<<U_<<E<<(v1^t)<<endl;
+    //std::exit(0);
 
-
-
-    // For reduced-D cases, the velocity used to track needs to be
-    // constrained, but the actual U_ of the parcel must not be
-    // altered or used, as it is altered by patch interactions an
-    // needs to retain its 3D value for collision purposes.
-    vector Utracking = U_;
-
-    while (td.keepParticle && !td.switchProcessor && p.stepFraction() < 1)
-    {
-
-        /*
-        Utracking = U_;
-
-        // Apply correction to velocity to constrain tracking for
-        // reduced-D cases
-        meshTools::constrainDirection(mesh, mesh.solutionD(), Utracking);
-
-        // Deviation from the mesh centre for reduced-D cases
-        const vector d = p.deviationFromMeshCentre();
-
-        const scalar f = 1 - p.stepFraction();
-        p.trackToAndHitFace(f*trackTime*Utracking - d, f, cloud, td);
-        */
-
-
-        const scalar sfrac = p.stepFraction();
-
-        const scalar f = 1 - p.stepFraction();
-        p.trackToAndHitFace(f*trackTime*U_, f, cloud, td);
-
-        const scalar dt = (p.stepFraction() - sfrac)*trackTime;
-
-        const volVectorField& BField = mesh.lookupObject<volVectorField>("B");
-        vector B = BField.internalField()[p.cell()];
-
-        const volVectorField& EField = mesh.lookupObject<volVectorField>("E");
-        vector E = EField.internalField()[p.cell()];
-
-        const constantProperties& constProps(cloud.constProps(typeId_));
-
-        // 4th order Runge-Kutta methods
-        scalar C = dt * constProps.charge() / constProps.mass();
-        vector dv1 = C * ((U_ ^ B) + E);
-        vector dv2 = C * (((U_ + dv1 / 2) ^ B) + E);
-        vector dv3 = C * (((U_ + dv2 / 2) ^ B) + E);
-        vector dv4 = C * (((U_ + dv3) ^ B) + E);
-        U_ += (dv1 + 2*dv2 + 2*dv3 + dv4)/6;
-
-
-    }
-
-    return td.keepParticle;
+    return true;
 }
 
 
