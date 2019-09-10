@@ -398,6 +398,8 @@ void Foam::PICCloud<ParcelType>::resetFields()
     {
         (*rhoNSpeciesList_[iHeatFlux]) = dimensionedScalar( dimensionSet(0, -3, 0, 0, 0), vSmall);
     }
+
+    (*rhoQNewAverage_) = 0.0;
 }
 
 
@@ -420,8 +422,8 @@ void Foam::PICCloud<ParcelType>::calculateFields()
 
         rhoNSpeciesList_[typeId]->primitiveFieldRef()[celli]++;
 
-        const tetIndices tetIs = p.currentTetIndices();
-        rhoQNewAverage_->add(p.coordinates(), tetIs, q);
+        //const tetIndices tetIs = p.currentTetIndices();
+        //rhoQNewAverage_->add(p.coordinates(), tetIs, q);
     }
 
     rhoN *= nParticle_/mesh().cellVolumes();
@@ -436,6 +438,10 @@ void Foam::PICCloud<ParcelType>::calculateFields()
         rhoNSpecies *= nParticle_/mesh().cellVolumes();
         rhoNSpeciesList_[iRhoNSpecies]->correctBoundaryConditions();
     }
+
+    rhoQNew = rhoQNewAverage_->averagePrimitiveField();
+    rhoQNew *= nParticle_/mesh().cellVolumes();
+    rhoQNew_.correctBoundaryConditions();
 
 
 }

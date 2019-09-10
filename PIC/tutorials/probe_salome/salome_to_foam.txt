@@ -1,3 +1,57 @@
 ideasUnvToFoam mesh1.unv
 
 transformPoints -scale '(2.5e-6 2.5e-6 2.5e-6)'
+
+
+
+6
+(
+    wall
+    {
+        type            wall;
+        nFaces          2290;
+        startFace       123222;
+    }
+    plasma
+    {
+        type            patch;
+        nFaces          1850;
+        startFace       125512;
+    }
+    side_x0
+    {
+        type            cyclic;
+        nFaces          1850;
+        startFace       127362;
+        matchTolerance  0.0001;
+        transform       unknown;
+        neighbourPatch  side_x1;
+    }
+    side_x1
+    {
+        type            cyclic;
+        nFaces          1850;
+        startFace       129212;
+        matchTolerance  0.0001;
+        transform       unknown;
+        neighbourPatch  side_x0;
+    }
+    side_y0
+    {
+        type            cyclic;
+        nFaces          1850;
+        startFace       131062;
+        matchTolerance  0.0001;
+        transform       unknown;
+        neighbourPatch  side_y1;
+    }
+    side_y1
+    {
+        type            cyclic;
+        nFaces          1850;
+        startFace       132912;
+        matchTolerance  0.0001;
+        transform       unknown;
+        neighbourPatch  side_y0;
+    }
+)

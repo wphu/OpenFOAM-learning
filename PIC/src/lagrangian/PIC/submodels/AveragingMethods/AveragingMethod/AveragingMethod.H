@@ -167,6 +167,9 @@ public:
         //- Return an internal field of the average
         virtual tmp<Field<Type>> primitiveField() const = 0;
 
+        //- Return an internal field of the average
+        virtual tmp<Field<Type>> averagePrimitiveField();
+
         //- Assign to another average
         inline void operator=(const AveragingMethod<Type>& x);
 

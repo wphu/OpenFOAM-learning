@@ -108,19 +108,16 @@ bool Foam::PICParcel<ParcelType>::move
         const scalar dt = (p.stepFraction() - sfrac)*trackTime;
  
         // 0 order interpolate
-        
-        //const volVectorField& BField = mesh.lookupObject<volVectorField>("B");
-        //vector B = BField.internalField()[p.cell()];
-
-        //const volVectorField& EField = mesh.lookupObject<volVectorField>("E");
-        //vector E = EField.internalField()[p.cell()];
+        const volVectorField& BField = mesh.lookupObject<volVectorField>("B");
+        vector B = BField.internalField()[p.cell()];
+        const volVectorField& EField = mesh.lookupObject<volVectorField>("E");
+        vector E = EField.internalField()[p.cell()];
         
 
         // 1 order interpolate
-        
-        const tetIndices tetIs = this->currentTetIndices();
-        vector E = td.EInterp().interpolate(this->coordinates(), tetIs);
-        vector B = td.BInterp().interpolate(this->coordinates(), tetIs);
+        //const tetIndices tetIs = this->currentTetIndices();
+        //vector E = td.EInterp().interpolate(this->coordinates(), tetIs);
+        //vector B = td.BInterp().interpolate(this->coordinates(), tetIs);
         
 
         const constantProperties& constProps(cloud.constProps(typeId_));

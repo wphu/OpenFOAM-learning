@@ -85,7 +85,7 @@ Foam::AveragingMethod<Type>::New
 )
 {
     //word averageType(dict.lookup(typeName));
-    word averageType("Dual");
+    word averageType("dual");
 
     // Info<< "Selecting averaging method "
     //    << averageType << endl;
@@ -247,5 +247,62 @@ bool Foam::AveragingMethod<Type>::write(const bool write) const
     return true;
 }
 
+
+
+template<class Type>
+Foam::tmp<Foam::Field<Type>>
+Foam::AveragingMethod<Type>::averagePrimitiveField()
+{
+    const pointMesh pointMesh_(mesh_);
+
+    // point volumes
+    Field<scalar> pointVolume(mesh_.nPoints(), 0);
+
+    // output fields
+    GeometricField<Type, fvPatchField, volMesh> cellValue
+    (
+        IOobject
+        (
+            this->name() + ":cellValue",
+            this->time().timeName(),
+            mesh_
+        ),
+        mesh_,
+        dimensioned<Type>("zero", dimless, Zero)
+    );
+
+
+    // Barycentric coordinates of the tet vertices
+    const FixedList<barycentric, 4>
+        tetCrds
+        ({
+            barycentric(1, 0, 0, 0),
+            barycentric(0, 1, 0, 0),
+            barycentric(0, 0, 1, 0),
+            barycentric(0, 0, 0, 1)
+        });
+
+    // tet-volume weighted sums
+    forAll(mesh_.C(), celli)
+    {
+        const List<tetIndices> cellTets =
+            polyMeshTetDecomposition::cellTetIndices(mesh_, celli);
+
+        forAll(cellTets, tetI)
+        {
+            const tetIndices& tetIs = cellTets[tetI];
+            const triFace triIs = tetIs.faceTriIs(mesh_);
+            const scalar v = tetIs.tet(mesh_).mag();
+
+            cellValue[celli] += v*interpolate(tetCrds[0], tetIs);
+        }
+    }
+
+    // average
+    //cellValue.primitiveFieldRef() /= mesh_.V();
+    return cellValue.primitiveField();
+
+    //return tmp<Field<Type>>(dataCell_);
+}
 
 // ************************************************************************* //
