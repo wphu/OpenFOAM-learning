@@ -160,6 +160,7 @@ void Foam::PICCloud<ParcelType>::initialise
                     nParticlesToInsert++;
                 }
 
+                
                 for (label pI = 0; pI < nParticlesToInsert; pI++)
                 {
                     point p = tet.randomPoint(rndGen_);
@@ -184,6 +185,7 @@ void Foam::PICCloud<ParcelType>::initialise
         }
     }
 
+
     // Initialise the sigmaTcRMax_ field to the product of the cross section of
     // the most abundant species and the most probable thermal speed (Bird,
     // p222-223)
@@ -202,6 +204,8 @@ void Foam::PICCloud<ParcelType>::initialise
     );
 
     sigmaTcRMax_.correctBoundaryConditions();
+
+
 }
 
 
