@@ -978,7 +978,9 @@ Foam::scalar Foam::PICCloud<ParcelType>::equipartitionInternalEnergy
     direction iDof
 )
 {
- 
+    // set to 0.0, or picFoam will encounter some weird errors
+    // Maybe the method 'equipartitionInternalEnergy' and other relative codes should be removed in the future.
+    return 0.0;
 }
 
 

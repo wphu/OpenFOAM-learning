@@ -397,12 +397,13 @@ void Foam::FreeStream<CloudType>::inflow()
                       + (t2 & faceVelocity)*t2
                       + mostProbableSpeed*uNormal*n;
 
+                    //Maybe this part should be removed in the future
                     scalar Ei = cloud.equipartitionInternalEnergy
                     (
                         faceTemperature,
                         cloud.constProps(typeId).internalDegreesOfFreedom()
                     );
-
+                    
                     cloud.addNewParcel(p, celli, U, Ei, typeId);
 
                     particlesInserted++;
