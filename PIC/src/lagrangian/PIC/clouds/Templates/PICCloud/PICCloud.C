@@ -386,7 +386,7 @@ void Foam::PICCloud<ParcelType>::resetFields()
 
     rhoN_ = dimensionedScalar( dimensionSet(0, -3, 0, 0, 0), vSmall);
     rhoQ_ =  dimensionedScalar( dimensionSet(0, -3, 1, 0, 0, 1, 0), vSmall);
-    rhoQNew_ =  dimensionedScalar( dimensionSet(0, -3, 1, 0, 0, 1, 0), vSmall);
+    //rhoQNew_ =  dimensionedScalar( dimensionSet(0, -3, 1, 0, 0, 1, 0), vSmall);
 
     forAll(rhoNSpeciesList_, iRhoNSpecies)
     {
@@ -395,15 +395,15 @@ void Foam::PICCloud<ParcelType>::resetFields()
 
     forAll(particleFluxList_, iParticleFlux)
     {
-        (*rhoNSpeciesList_[iParticleFlux]) = dimensionedScalar( dimensionSet(0, -3, 0, 0, 0), vSmall);
+        (*particleFluxList_[iParticleFlux]) = dimensionedScalar( dimensionSet(0, -3, 0, 0, 0), vSmall);
     }
 
     forAll(heatFluxList_, iHeatFlux)
     {
-        (*rhoNSpeciesList_[iHeatFlux]) = dimensionedScalar( dimensionSet(0, -3, 0, 0, 0), vSmall);
+        (*heatFluxList_[iHeatFlux]) = dimensionedScalar( dimensionSet(0, -3, 0, 0, 0), vSmall);
     }
 
-    (*rhoQNewAverage_) = 0.0;
+    //(*rhoQNewAverage_) = 0.0;
 }
 
 
@@ -412,7 +412,7 @@ void Foam::PICCloud<ParcelType>::calculateFields()
 {
     scalarField& rhoN = rhoN_.primitiveFieldRef();
     scalarField& rhoQ = rhoQ_.primitiveFieldRef(); 
-    scalarField& rhoQNew = rhoQNew_.primitiveFieldRef(); 
+    //scalarField& rhoQNew = rhoQNew_.primitiveFieldRef(); 
 
     forAllConstIter(typename PICCloud<ParcelType>, *this, iter)
     {
@@ -443,9 +443,9 @@ void Foam::PICCloud<ParcelType>::calculateFields()
         rhoNSpeciesList_[iRhoNSpecies]->correctBoundaryConditions();
     }
 
-    rhoQNew = rhoQNewAverage_->averagePrimitiveField();
-    rhoQNew *= nParticle_/mesh().cellVolumes();
-    rhoQNew_.correctBoundaryConditions();
+    //rhoQNew = rhoQNewAverage_->averagePrimitiveField();
+    //rhoQNew *= nParticle_/mesh().cellVolumes();
+    //rhoQNew_.correctBoundaryConditions();
 
 
 }
@@ -913,14 +913,15 @@ void Foam::PICCloud<ParcelType>::evolve()
     this->inflowBoundary().inflow();
 
 
-    const volVectorField& E = mesh_.lookupObject<const volVectorField>("E");
-    const volVectorField& B = mesh_.lookupObject<const volVectorField>("B");
+    //const volVectorField& E = mesh_.lookupObject<const volVectorField>("E");
+    //const volVectorField& B = mesh_.lookupObject<const volVectorField>("B");
 
-    interpolationCellPoint<vector> EInterp(E);
-    interpolationCellPoint<vector> BInterp(B);
+    //interpolationCellPoint<vector> EInterp(E);
+    //interpolationCellPoint<vector> BInterp(B);
 
 
-    typename ParcelType::trackingData td(*this, EInterp, BInterp);
+    //typename ParcelType::trackingData td(*this, EInterp, BInterp);
+    typename ParcelType::trackingData td(*this);
 
     // Move the particles ballistically with their current velocities
     Cloud<ParcelType>::move(*this, td, mesh_.time().deltaTValue());
@@ -929,7 +930,7 @@ void Foam::PICCloud<ParcelType>::evolve()
     buildCellOccupancy();
 
     // Calculate new velocities via stochastic collisions
-    collisions();
+    //collisions();
 
     // Calculate the volume field data
     calculateFields();

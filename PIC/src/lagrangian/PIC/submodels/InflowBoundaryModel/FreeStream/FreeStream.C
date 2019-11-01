@@ -27,6 +27,9 @@ License
 #include "constants.H"
 #include "triPointRef.H"
 #include "tetIndices.H"
+#include "Random.H"
+#include "clock.H"
+
 
 using namespace Foam::constant::mathematical;
 
@@ -147,7 +150,8 @@ void Foam::FreeStream<CloudType>::inflow()
 
     const scalar deltaT = mesh.time().deltaTValue();
 
-    Random& rndGen(cloud.rndGen());
+    //Random& rndGen(cloud.rndGen());
+    Random rndGen(clock::getTime() + pid());
 
     scalar sqrtPi = sqrt(pi);
 
@@ -344,6 +348,11 @@ void Foam::FreeStream<CloudType>::inflow()
                     // Coefficients required for Bird eqn 12.5
                     scalar uNormProbCoeffA =
                         sCosTheta + sqrt(sqr(sCosTheta) + 2.0);
+                    if(uNormProbCoeffA == 0.0)
+                    {
+                        std::cout<<"uNormProbCoeffA =0 "<<endl;
+                        uNormProbCoeffA = 1.0;
+                    }
 
                     scalar uNormProbCoeffB =
                         0.5*

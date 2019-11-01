@@ -178,22 +178,23 @@ inline Foam::scalar& Foam::PICParcel<ParcelType>::Ei()
 
 
 template<class ParcelType>
+template<class TrackCloudType>
 inline Foam::PICParcel<ParcelType>::trackingData::trackingData
 (
-    const PICCloud<PICParcel<ParcelType>>& pc,
-    const interpolationCellPoint<vector>& EInterp,
-    const interpolationCellPoint<vector>& BInterp
+    const TrackCloudType& cloud
+    //const interpolationCellPoint<vector>& EInterp,
+    //const interpolationCellPoint<vector>& BInterp
 )
 :
-    particle::trackingData(pc),
-    EInterp_(EInterp),
-    BInterp_(BInterp)
+    ParcelType::trackingData(cloud)
+    ///EInterp_(EInterp),
+    //BInterp_(BInterp)
 {}
 
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
+/*
 template<class ParcelType>
 inline const Foam::interpolationCellPoint<Foam::vector>&
 Foam::PICParcel<ParcelType>::trackingData::EInterp() const
@@ -207,7 +208,7 @@ Foam::PICParcel<ParcelType>::trackingData::BInterp() const
 {
     return BInterp_;
 }
-
+*/
 
 
 // ************************************************************************* //

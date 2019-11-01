@@ -136,32 +136,29 @@ public:
     //- Use base tracking data
     //typedef typename ParcelType::trackingData trackingData;
 
-    //- Class used to pass tracking data to the trackToFace function
+    //- Use self-define tracking data: Class used to pass tracking data to the trackToFace function
     class trackingData
     :
         public ParcelType::trackingData
     {
         // Interpolators for continuous phase fields
-
-
-            const interpolationCellPoint<vector>& EInterp_;
-            const interpolationCellPoint<vector>& BInterp_;
+        //const interpolationCellPoint<vector>& EInterp_;
+        //const interpolationCellPoint<vector>& BInterp_;
 
     public:
 
         // Constructors
-
-            inline trackingData
-            (
-                const PICCloud<PICParcel<ParcelType>>& pc,
-                const interpolationCellPoint<vector>& EInterp,
-                const interpolationCellPoint<vector>& BInterp
-            );
+        template <class TrackCloudType>
+        inline trackingData
+        (
+            const TrackCloudType& cloud
+            //const interpolationCellPoint<vector>& EInterp,
+            //const interpolationCellPoint<vector>& BInterp
+        );
 
         // Member Functions
-
-            inline const interpolationCellPoint<vector>& EInterp() const;
-            inline const interpolationCellPoint<vector>& BInterp() const;
+        //inline const interpolationCellPoint<vector>& EInterp() const;
+        //inline const interpolationCellPoint<vector>& BInterp() const;
     };
 
 

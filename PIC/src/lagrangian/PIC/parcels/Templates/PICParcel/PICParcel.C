@@ -46,24 +46,24 @@ bool Foam::PICParcel<ParcelType>::move
     const polyMesh& mesh = cloud.pMesh();
 
 
-    /*
+    
     // only update velocity at the begenning of the current step
     // if the particle crosses processor patch, it will not be updated again, for mpi parallel
     if(p.stepFraction() == 0.0)
     {
         // 0 order interpolate
-        //const volVectorField& BField = mesh.lookupObject<volVectorField>("B");
-        //vector B = BField.internalField()[p.cell()];
+        const volVectorField& BField = mesh.lookupObject<volVectorField>("B");
+        vector B = BField.internalField()[p.cell()];
 
-        //const volVectorField& EField = mesh.lookupObject<volVectorField>("E");
-        //vector E = EField.internalField()[p.cell()];
+        const volVectorField& EField = mesh.lookupObject<volVectorField>("E");
+        vector E = EField.internalField()[p.cell()];
         
 
         // 1 order interpolate
         
-        const tetIndices tetIs = this->currentTetIndices();
-        vector E = td.EInterp().interpolate(this->coordinates(), tetIs);
-        vector B = td.BInterp().interpolate(this->coordinates(), tetIs);
+        //const tetIndices tetIs = this->currentTetIndices();
+        //vector E = td.EInterp().interpolate(this->coordinates(), tetIs);
+        //vector B = td.BInterp().interpolate(this->coordinates(), tetIs);
         
 
         const constantProperties& constProps(cloud.constProps(typeId_));
@@ -92,7 +92,7 @@ bool Foam::PICParcel<ParcelType>::move
         //Info<<U_<<E<<(v1^t)<<endl;
         //std::exit(0);
     }
-    */
+    
 
     // 
     while (td.keepParticle && !td.switchProcessor && p.stepFraction() < 1)
@@ -104,7 +104,10 @@ bool Foam::PICParcel<ParcelType>::move
         p.trackToAndHitFace(f*trackTime*U_, f, cloud, td);
 
 
-        
+        /*
+        // only update velocity at the begenning of the current step
+        // if the particle crosses processor patch, it will not be updated again, for mpi parallel
+
         const scalar dt = (p.stepFraction() - sfrac)*trackTime;
  
         // 0 order interpolate
@@ -132,7 +135,7 @@ bool Foam::PICParcel<ParcelType>::move
         //U_ += (dv1 + 2*dv2 + 2*dv3 + dv4)/6;
         
 
-        // Boris frog-leakp
+        // Boris frog-leap
         //Info<<U_<<E<<endl;
         const scalar C = 0.5 * dt * constProps.charge() / constProps.mass();
         vector t = C * B;
@@ -145,6 +148,9 @@ bool Foam::PICParcel<ParcelType>::move
         U_ = v3 + C * E;
         //Info<<U_<<E<<(v1^t)<<endl;
         //std::exit(0);
+
+
+        */
         
 
     }
@@ -245,6 +251,7 @@ void Foam::PICParcel<ParcelType>::hitWallPatch
     trackingData& td
 )
 {
+    
     const label wppIndex = this->patch();
 
     const wallPolyPatch& wpp =
@@ -270,6 +277,7 @@ void Foam::PICParcel<ParcelType>::hitWallPatch
 
     cloud.particleFluxBF(typeId_)[wppIndex][wppLocalFace] += cloud.nParticle()/(deltaT*fA);
     cloud.heatFluxBF(typeId_)[wppIndex][wppLocalFace] += cloud.nParticle()*E/(deltaT*fA);
+    
 
     td.keepParticle = false;
 }
