@@ -210,6 +210,123 @@ void Foam::PICCloud<ParcelType>::initialise
 
 
 template<class ParcelType>
+void Foam::PICCloud<ParcelType>::reloadSource()
+{
+    label time_step = mesh().time().value() / mesh().time().deltaT().value();
+    if(time_step % 5 == 0)
+    {
+        //Info<<"Current time step: "<<time_step<<endl;
+        forAll(source_CellList_, i)
+        {
+            const label celli = source_CellList_[i];
+
+            // delete all particles in cells of source_CellList_
+            DynamicList<ParcelType*>& cellParcels(cellOccupancy_[celli]);
+            forAll(cellParcels, i)
+            {
+                ParcelType& p = *cellParcels[i];
+                this->deleteParticle(p);
+            }
+
+            List<tetIndices> cellTets = polyMeshTetDecomposition::cellTetIndices
+            (
+                mesh_,
+                celli
+            );
+
+            forAll(cellTets, tetI)
+            {
+                const tetIndices& cellTetIs = cellTets[tetI];
+                tetPointRef tet = cellTetIs.tet(mesh_);
+                scalar tetVolume = tet.mag();
+
+                forAll(source_molecules_, i)
+                {
+                    const word& moleculeName(source_molecules_[i]);
+
+                    label typeId(findIndex(typeIdList_, moleculeName));
+
+                    if (typeId == -1)
+                    {
+                        FatalErrorInFunction
+                            << "typeId " << moleculeName << "not defined." << nl
+                            << abort(FatalError);
+                    }
+
+                    const typename ParcelType::constantProperties& cP =
+                    constProps(typeId);
+
+                    scalar numberDensity = source_numberDensities_[i];
+
+                    // Calculate the number of particles required
+                    scalar particlesRequired = numberDensity*tetVolume;
+
+                    // Only integer numbers of particles can be inserted
+                    label nParticlesToInsert = label(particlesRequired);
+
+                    // Add another particle with a probability proportional to the
+                    // remainder of taking the integer part of particlesRequired
+                    if
+                    (
+                        (particlesRequired - nParticlesToInsert)
+                    > rndGen_.scalar01()
+                    )
+                    {
+                        nParticlesToInsert++;
+                    }
+
+                    
+                    for (label pI = 0; pI < nParticlesToInsert; pI++)
+                    {
+                        point p = tet.randomPoint(rndGen_);
+
+                        vector U = equipartitionLinearVelocity
+                        (
+                            source_temperature_,
+                            cP.mass()
+                        );
+
+                        scalar Ei = equipartitionInternalEnergy
+                        (
+                            source_temperature_,
+                            cP.internalDegreesOfFreedom()
+                        );
+
+                        U += source_velocity_;
+
+                        addNewParcel(p, celli, U, Ei, typeId);
+                    }
+                }
+            }
+        }
+    }
+
+
+
+    // Initialise the sigmaTcRMax_ field to the product of the cross section of
+    // the most abundant species and the most probable thermal speed (Bird,
+    // p222-223)
+    /*
+    label mostAbundantType(findMax(numberDensities));
+
+    const typename ParcelType::constantProperties& cP = constProps
+    (
+        mostAbundantType
+    );
+
+    sigmaTcRMax_.primitiveFieldRef() = cP.sigmaT()*maxwellianMostProbableSpeed
+    (
+        temperature,
+        cP.mass()
+    );
+
+    sigmaTcRMax_.correctBoundaryConditions();
+    */
+
+}
+
+
+template<class ParcelType>
 void Foam::PICCloud<ParcelType>::collisions()
 {
     if (!binaryCollision().active())
@@ -474,6 +591,7 @@ Foam::PICCloud<ParcelType>::PICCloud
 (
     const word& cloudName,
     const fvMesh& mesh,
+    const IOdictionary& picInitialiseDict,
     bool readFields
 )
 :
@@ -707,7 +825,42 @@ Foam::PICCloud<ParcelType>::PICCloud
     );
     
     
+    // define source region
+    const scalar source_zmin = readScalar(picInitialiseDict.lookup("source_zmin"));
+    const volVectorField& C = mesh.C();
+    source_CellList_.setSize(0);
+    forAll(mesh_.cells(), celli)
+    {
+        if(C[celli].component(2) >= source_zmin)
+        {
+            source_CellList_.append(celli);
+        }
+    }
 
+    //Info<< nl << "reloading particles" << endl;
+
+    source_temperature_ = readScalar(picInitialiseDict.lookup("temperature"));
+
+    source_velocity_ = picInitialiseDict.lookup("velocity");
+
+    const dictionary& numberDensitiesDict
+    (
+        picInitialiseDict.subDict("numberDensities")
+    );
+
+    source_molecules_ = numberDensitiesDict.toc();
+
+    source_numberDensities_.setSize(source_molecules_.size());
+
+    forAll(source_molecules_, i)
+    {
+        source_numberDensities_[i] = readScalar
+        (
+            numberDensitiesDict.lookup(source_molecules_[i])
+        );
+    }
+
+    source_numberDensities_ /= nParticle_;
 
 
     // Initialise the collision selection remainder to a random value between 0
@@ -911,6 +1064,9 @@ void Foam::PICCloud<ParcelType>::evolve()
 
     // Insert new particles from the inflow boundary
     this->inflowBoundary().inflow();
+
+    // reload particles in source region
+    reloadSource();
 
 
     //const volVectorField& E = mesh_.lookupObject<const volVectorField>("E");

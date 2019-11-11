@@ -10,6 +10,19 @@ IOdictionary picInitialiseDict
         IOobject::NO_WRITE
     )
 );
+
+IOdictionary phi_from_file
+(
+    IOobject
+    (
+        "electric_potential",
+        runTime.constant(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::NO_WRITE
+    )
+);
+
 picCloud pic("pic", mesh, picInitialiseDict, true);
 
 volVectorField B

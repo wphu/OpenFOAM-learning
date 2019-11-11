@@ -1,0 +1,3 @@
+testParticleFoam.C
+
+EXE = $(FOAM_APPBIN)/testParticleFoam

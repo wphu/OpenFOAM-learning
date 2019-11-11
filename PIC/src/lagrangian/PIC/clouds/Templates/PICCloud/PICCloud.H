@@ -158,6 +158,13 @@ class PICCloud
             autoPtr<InflowBoundaryModel<PICCloud<ParcelType>>>
                 inflowBoundaryModel_;
 
+        // particle source in some region
+            labelList source_CellList_;
+            Field<scalar> source_numberDensities_;
+            vector source_velocity_;
+            scalar source_temperature_;
+            List<word> source_molecules_;
+
 
     // Private Member Functions
 
@@ -169,6 +176,9 @@ class PICCloud
 
         //- Initialise the system
         void initialise(const IOdictionary& picInitialiseDict);
+
+        //- reload particles in source region
+        void reloadSource();
 
         //- Calculate collisions between molecules
         void collisions();
@@ -190,7 +200,8 @@ public:
         (
             const word& cloudName,
             const fvMesh& mesh,
-            bool readFields = true
+            const IOdictionary& picInitialiseDict,
+            bool readFields
         );
 
         //- Construct given name, mesh and initialisation dictionary.
